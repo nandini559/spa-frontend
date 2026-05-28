@@ -2,7 +2,15 @@ import { useState } from "react";
 
 import api from "../../api/axios";
 
-const AddEditUser = () => {
+interface Props {
+  fetchUsers: () => void;
+  closeForm: () => void;
+}
+
+const AddEditUser = ({
+  fetchUsers,
+  closeForm
+}: Props) => {
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -43,6 +51,10 @@ const AddEditUser = () => {
 
       alert("User Created Successfully");
 
+      fetchUsers();
+
+      closeForm();
+
       setFormData({
         userId: "",
         password: "",
@@ -59,6 +71,7 @@ const AddEditUser = () => {
       );
 
     } finally {
+
       setLoading(false);
     }
   };
@@ -76,7 +89,6 @@ const AddEditUser = () => {
         className="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
 
-        {/* User ID */}
         <input
           type="text"
           name="userId"
@@ -87,7 +99,6 @@ const AddEditUser = () => {
           required
         />
 
-        {/* Password */}
         <input
           type="password"
           name="password"
@@ -98,13 +109,13 @@ const AddEditUser = () => {
           required
         />
 
-        {/* Role */}
         <select
           name="role"
           value={formData.role}
           onChange={handleChange}
           className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
         >
+
           <option value="USER">
             User
           </option>
@@ -112,9 +123,9 @@ const AddEditUser = () => {
           <option value="ADMIN">
             Admin
           </option>
+
         </select>
 
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}

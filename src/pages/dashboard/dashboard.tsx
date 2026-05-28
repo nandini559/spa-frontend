@@ -8,11 +8,18 @@ import {
 } from "react-icons/fa";
 
 import { getRecords } from "../../api/recordApi";
+import { useNavigate } from "react-router-dom";
+import AddEditRecord from "../records/addEditRecords";
 
 const Dashboard = () => {
 
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+const navigate = useNavigate();
+
+const [showForm, setShowForm] = useState(false);
+  
 
   const fetchRecords = async () => {
 
@@ -208,11 +215,39 @@ const Dashboard = () => {
 
         </div>
 
-        <button className="bg-[#6C4CF1] hover:bg-[#5a3ee0] text-white px-5 py-3 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1">
+        {
+  showForm && (
 
-          + Add Record
+    <div>
 
+      <div className="flex justify-end mb-3">
+
+        <button
+          onClick={() => setShowForm(false)}
+          className="text-red-500 font-medium"
+        >
+          Close
         </button>
+
+      </div>
+
+      <AddEditRecord
+        fetchRecords={fetchRecords}
+        closeForm={() => setShowForm(false)}
+      />
+
+    </div>
+  )
+}
+
+       <button
+  onClick={() => setShowForm(true)}
+  className="bg-[#6C4CF1] hover:bg-[#5a3ee0] text-white px-5 py-3 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1"
+>
+
+  + Add Record
+
+</button>
 
       </div>
 
@@ -264,11 +299,14 @@ const Dashboard = () => {
             Recent Records
           </h2>
 
-          <button className="text-[#6C4CF1] font-medium hover:underline">
+         <button
+  onClick={() => navigate("/records")}
+  className="text-[#6C4CF1] font-medium hover:underline"
+>
 
-            View All
+  View All
 
-          </button>
+</button>
 
         </div>
 

@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
+
 import { getRecords } from "../../api/recordApi";
+import AddEditRecord from "./addEditRecords";
+
 
 const Records = () => {
 
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+const [selectedRecord, setSelectedRecord] =
+  useState<any>(null);
+
 
   const fetchRecords = async () => {
+
     try {
 
       const data = await getRecords();
@@ -14,8 +22,11 @@ const Records = () => {
       setRecords(data);
 
     } catch (error) {
+
       console.log(error);
+
     } finally {
+
       setLoading(false);
     }
   };
@@ -27,6 +38,7 @@ const Records = () => {
   let tableContent;
 
   if (loading) {
+
     tableContent = (
       <tr>
         <td className="py-4">
@@ -34,7 +46,9 @@ const Records = () => {
         </td>
       </tr>
     );
+
   } else if (records.length === 0) {
+
     tableContent = (
       <tr>
         <td className="py-4">
@@ -42,8 +56,11 @@ const Records = () => {
         </td>
       </tr>
     );
+
   } else {
+
     tableContent = records.map((record) => (
+
       <tr
         key={record.id}
         className="border-b"
@@ -73,9 +90,20 @@ const Records = () => {
         </td>
 
         <td>
-          <button className="text-blue-500">
-            Edit
-          </button>
+
+         <button
+  onClick={() => {
+
+    setSelectedRecord(record);
+
+    setShowForm(true);
+
+  }}
+  className="text-blue-500"
+>
+  Edit
+</button>
+
         </td>
 
       </tr>
@@ -83,33 +111,76 @@ const Records = () => {
   }
 
   return (
+
     <div className="space-y-6">
 
+      {/* Header */}
       <div className="flex items-center justify-between">
 
         <h1 className="text-3xl font-bold">
           Records Management
         </h1>
 
-        <button className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg">
+        <button
+         onClick={() => {
+
+  setSelectedRecord(null);
+
+  setShowForm(true);
+
+}}
+          className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg"
+        >
           Add Record
         </button>
 
       </div>
 
+      {/* Form */}
+      {
+        showForm && (
+
+          <div>
+
+            <div className="flex justify-end mb-3">
+
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-red-500 font-medium"
+              >
+                Close
+              </button>
+
+            </div>
+
+           <AddEditRecord
+  fetchRecords={fetchRecords}
+  closeForm={() => setShowForm(false)}
+  selectedRecord={selectedRecord}
+/>
+
+          </div>
+        )
+      }
+
+      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border p-6 overflow-x-auto">
 
         <table className="w-full">
 
           <thead>
+
             <tr className="border-b text-left">
+
               <th className="py-3">Title</th>
               <th>User</th>
               <th>Status</th>
               <th>Access</th>
               <th>Date</th>
               <th>Action</th>
+
             </tr>
+
           </thead>
 
           <tbody>

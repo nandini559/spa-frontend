@@ -10,14 +10,15 @@ const Login = () => {
 
   const [formData, setFormData] = useState({
     userId: "",
-    password: ""
+    password: "",
+    role: "USER"
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement
+      HTMLInputElement | HTMLSelectElement
     >
   ) => {
 
@@ -28,38 +29,49 @@ const Login = () => {
   };
 
   const handleLogin = async (
-    e: React.FormEvent
-  ) => {
+  e: React.FormEvent
+) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
+  try {
 
-      setLoading(true);
+    setLoading(true);
 
-      const response = await loginUser(
-        formData
-      );
+    const response = await loginUser(
+      formData
+    );
 
-      console.log(response);
+    console.log(response);
 
-      alert("Login Successful");
+    // Save logged in user
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.user)
+    );
 
-      navigate("/dashboard");
+    alert("Login Successful");
 
-    } catch (error: any) {
+    navigate("/dashboard");
 
-      console.log(error);
+  } catch (error: any) {
 
-      alert(
-        error?.response?.data?.message ||
-        "Login Failed"
-      );
+    console.log(error);
 
-    } finally {
-      setLoading(false);
-    }
-  };
+    alert(
+      error?.response?.data?.message ||
+      "Login Failed"
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
+
+  
 
   return (
 
@@ -75,9 +87,11 @@ const Login = () => {
         <div className="relative z-10 text-center text-white">
 
           <div className="w-24 h-24 bg-[#6C4CF1] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+
             <span className="text-4xl">
               🔐
             </span>
+
           </div>
 
           <h1 className="text-5xl font-extrabold mb-4">
@@ -150,11 +164,37 @@ const Login = () => {
 
             </div>
 
+            {/* Role */}
+            <div>
+
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Role
+              </label>
+
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
+              >
+
+                <option value="USER">
+                  General User
+                </option>
+
+                <option value="ADMIN">
+                  Admin
+                </option>
+
+              </select>
+
+            </div>
+
             {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#6C4CF1] hover:bg-[#5938db] text-white py-3 rounded-xl font-semibold shadow-lg"
+              className="w-full bg-[#6C4CF1] hover:bg-[#5938db] text-white py-3 rounded-xl font-semibold shadow-lg disabled:opacity-70"
             >
 
               {

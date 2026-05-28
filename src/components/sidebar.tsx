@@ -1,14 +1,9 @@
-import {NavLink} from "react-router-dom";
-import {
-  FaHome,
-  FaUsers,
-  FaFileAlt,
-  FaUser,
-  FaLock,
-  FaSignOutAlt
-} from "react-icons/fa";
+import {NavLink, useNavigate} from "react-router-dom";
+import {FaHome, FaUsers, FaFileAlt, FaUser, FaLock} from "react-icons/fa";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   const navItems = [
     {
       name: "Dashboard",
@@ -32,6 +27,14 @@ const Sidebar = () => {
       icon: <FaLock/>
     }
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+
+    localStorage.removeItem("token");
+
+    navigate("/");
+  };
 
   return (<aside className="w-72 bg-[#111827] text-white min-h-screen p-5 flex flex-col">
     {/* Logo */}
@@ -60,9 +63,7 @@ const Sidebar = () => {
     </nav>
 
     {/* Logout */}
-    <button className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-red-500 hover:text-white transition-all">
-      <FaSignOutAlt/>
-
+    <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-red-500 hover:text-white transition-all">
       <span>Logout</span>
     </button>
   </aside>);

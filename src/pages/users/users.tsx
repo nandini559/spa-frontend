@@ -1,9 +1,12 @@
 import {useEffect, useState} from "react";
 import {getUsers} from "../../api/userApi";
+import AddEditUser from "./addEditUsers";
 
 const Users = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [showForm, setShowForm] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -22,14 +25,29 @@ const Users = () => {
   }, []);
 
   return (<div className="space-y-6">
+    {/* Header */}
     <div className="flex items-center justify-between">
       <h1 className="text-3xl font-bold">Users Management</h1>
 
-      <button className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg">
+      <button onClick={() => setShowForm(true)} className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg">
         Add User
       </button>
     </div>
 
+    {/* Form */}
+    {
+      showForm && (<div>
+        <div className="flex justify-end mb-3">
+          <button onClick={() => setShowForm(false)} className="text-red-500 font-medium">
+            Close
+          </button>
+        </div>
+
+        <AddEditUser fetchUsers={fetchUsers} closeForm={() => setShowForm(false)}/>
+      </div>)
+    }
+
+    {/* Table */}
     <div className="bg-white rounded-2xl shadow-sm border p-6">
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -56,7 +74,7 @@ const Users = () => {
                   : (users.map((user) => (<tr key={user.id} className="border-b">
                     <td className="py-4">{user.userId}</td>
 
-                    <td>{user.password}</td>
+                    <td>********</td>
 
                     <td>{user.role}</td>
 

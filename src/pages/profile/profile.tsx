@@ -1,19 +1,21 @@
 import {useEffect, useState} from "react";
 
 import {FaEnvelope, FaUserShield, FaPhone, FaMapMarkerAlt, FaEdit} from "react-icons/fa";
-
-import {getUsers} from "../../api/userApi";
+import {useNavigate} from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   const fetchProfile = async () => {
     try {
-      const users = await getUsers();
+      const loggedInUser = localStorage.getItem("user");
 
-      // temporary first user
-      setUser(users[0]);
+      if (loggedInUser) {
+        setUser(JSON.parse(loggedInUser));
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -49,9 +51,8 @@ const Profile = () => {
             <p className="text-gray-500 mt-1">{user.role}</p>
           </div>
 
-          <button className="flex items-center gap-2 bg-[#6C4CF1] hover:bg-[#5938db] text-white px-5 py-3 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <FaEdit/>
-            Edit Profile
+          <button onClick={() => navigate("/change-password")} className="flex items-center gap-2 bg-[#6C4CF1] hover:bg-[#5938db] text-white px-5 py-3 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1">
+            Change Password
           </button>
         </div>
 
