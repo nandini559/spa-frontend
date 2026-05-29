@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
 
 import { getRecords } from "../../api/recordApi";
-import AddEditRecord from "./addEditRecords";
 
+import AddEditRecord from "./addEditRecords";
 
 const Records = () => {
 
-  const [records, setRecords] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-const [selectedRecord, setSelectedRecord] =
-  useState<any>(null);
+  const [records, setRecords] =
+    useState<any[]>([]);
 
+  const [loading, setLoading] =
+    useState(true);
+
+  const [showForm, setShowForm] =
+    useState(false);
+
+  const [selectedRecord, setSelectedRecord] =
+    useState<any>(null);
 
   const fetchRecords = async () => {
 
     try {
 
-      const data = await getRecords();
+      const data =
+        await getRecords();
 
       setRecords(data);
 
@@ -32,7 +41,9 @@ const [selectedRecord, setSelectedRecord] =
   };
 
   useEffect(() => {
+
     fetchRecords();
+
   }, []);
 
   let tableContent;
@@ -40,74 +51,141 @@ const [selectedRecord, setSelectedRecord] =
   if (loading) {
 
     tableContent = (
+
       <tr>
-        <td className="py-4">
+
+        <td
+          colSpan={6}
+          className="py-6 text-center"
+        >
+
           Loading...
+
         </td>
+
       </tr>
     );
 
-  } else if (records.length === 0) {
+  } else if (
+    records.length === 0
+  ) {
 
     tableContent = (
+
       <tr>
-        <td className="py-4">
+
+        <td
+          colSpan={6}
+          className="py-6 text-center"
+        >
+
           No Records Found
+
         </td>
+
       </tr>
     );
 
   } else {
 
-    tableContent = records.map((record) => (
+    tableContent = records.map(
+      (record) => (
 
-      <tr
-        key={record.id}
-        className="border-b"
-      >
+        <tr
+          key={record.id}
+          className="
+            border-b
+            hover:bg-gray-50
+            transition-all
+          "
+        >
 
-        <td className="py-4">
-          {record.title}
-        </td>
+          <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-700">
 
-        <td>
-          {record.user?.userId}
-        </td>
+            {record.title}
 
-        <td>
-          {record.status}
-        </td>
+          </td>
 
-        <td>
-          {record.access}
-        </td>
+          <td className="px-4 whitespace-nowrap text-gray-600">
 
-        <td>
-          {
-            new Date(record.createdAt)
-              .toLocaleDateString()
-          }
-        </td>
+            {
+              record.user
+                ?.userId
+            }
 
-        <td>
+          </td>
 
-         <button
-  onClick={() => {
+          <td className="px-4 whitespace-nowrap">
 
-    setSelectedRecord(record);
+            <span
+              className={`
+                px-3 py-1
+                rounded-full
+                text-xs sm:text-sm
+                font-medium
+                ${
+                  record.status ===
+                  "ACTIVE"
+                    ? "bg-green-100 text-green-700"
+                    : record.status ===
+                      "PENDING"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-red-100 text-red-700"
+                }
+              `}
+            >
 
-    setShowForm(true);
+              {record.status}
 
-  }}
-  className="text-blue-500"
->
-  Edit
-</button>
+            </span>
 
-        </td>
+          </td>
 
-      </tr>
-    ));
+          <td className="px-4 whitespace-nowrap text-gray-600">
+
+            {record.access}
+
+          </td>
+
+          <td className="px-4 whitespace-nowrap text-gray-600">
+
+            {
+              new Date(
+                record.createdAt
+              ).toLocaleDateString()
+            }
+
+          </td>
+
+          <td className="px-4 whitespace-nowrap">
+
+            <button
+              onClick={() => {
+
+                setSelectedRecord(
+                  record
+                );
+
+                setShowForm(true);
+
+              }}
+              className="
+                text-blue-500
+                hover:text-blue-700
+                font-medium
+                transition
+              "
+            >
+
+              Edit
+
+            </button>
+
+          </td>
+
+        </tr>
+      )
+    );
   }
 
   return (
@@ -115,79 +193,210 @@ const [selectedRecord, setSelectedRecord] =
     <div className="space-y-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div
+        className="
+          flex flex-col
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+          gap-4
+        "
+      >
 
-        <h1 className="text-3xl font-bold">
-          Records Management
-        </h1>
+        <div>
+
+          <h1
+            className="
+              text-2xl sm:text-3xl
+              font-bold
+              text-gray-800
+            "
+          >
+
+            Records Management
+
+          </h1>
+
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
+
+            Manage all records
+            from one place.
+
+          </p>
+
+        </div>
 
         <button
-         onClick={() => {
+          onClick={() => {
 
-  setSelectedRecord(null);
+            setSelectedRecord(
+              null
+            );
 
-  setShowForm(true);
+            setShowForm(true);
 
-}}
-          className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg"
+          }}
+          className="
+            bg-[#6C4CF1]
+            hover:bg-[#5a3ee0]
+            text-white
+            px-5 py-3
+            rounded-xl
+            shadow-lg
+            transition-all
+            duration-300
+            hover:-translate-y-1
+            w-full sm:w-auto
+          "
         >
-          Add Record
+
+          + Add Record
+
         </button>
 
       </div>
 
-      {/* Form */}
+      {/* Form Modal */}
       {
         showForm && (
 
-          <div>
+          <div
+            className="
+              fixed inset-0 z-50
+              bg-black/40
+              flex items-center justify-center
+              p-4
+            "
+          >
 
-            <div className="flex justify-end mb-3">
+            <div
+              className="
+                bg-white
+                w-full max-w-3xl
+                rounded-3xl
+                shadow-2xl
+                p-4 sm:p-6
+                overflow-y-auto
+                max-h-[90vh]
+              "
+            >
 
-              <button
-                onClick={() => setShowForm(false)}
-                className="text-red-500 font-medium"
-              >
-                Close
-              </button>
+              {/* Modal Header */}
+              <div className="flex items-center justify-between mb-5">
+
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+
+                  {
+                    selectedRecord
+                      ? "Edit Record"
+                      : "Add Record"
+                  }
+
+                </h2>
+
+                <button
+                  onClick={() =>
+                    setShowForm(false)
+                  }
+                  className="
+                    text-red-500
+                    hover:text-red-700
+                    font-medium
+                  "
+                >
+
+                  Close
+
+                </button>
+
+              </div>
+
+              <AddEditRecord
+                fetchRecords={
+                  fetchRecords
+                }
+                closeForm={() =>
+                  setShowForm(false)
+                }
+                selectedRecord={
+                  selectedRecord
+                }
+              />
 
             </div>
-
-           <AddEditRecord
-  fetchRecords={fetchRecords}
-  closeForm={() => setShowForm(false)}
-  selectedRecord={selectedRecord}
-/>
 
           </div>
         )
       }
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-sm border p-6 overflow-x-auto">
+      <div
+        className="
+          bg-white
+          rounded-2xl sm:rounded-3xl
+          shadow-sm
+          border
+          p-4 sm:p-6
+        "
+      >
 
-        <table className="w-full">
+        <div className="overflow-x-auto rounded-2xl">
 
-          <thead>
+          <table className="w-full min-w-[750px]">
 
-            <tr className="border-b text-left">
+            <thead className="bg-gray-100">
 
-              <th className="py-3">Title</th>
-              <th>User</th>
-              <th>Status</th>
-              <th>Access</th>
-              <th>Date</th>
-              <th>Action</th>
+              <tr className="text-left text-gray-600">
 
-            </tr>
+                <th className="py-4 px-4 font-semibold">
 
-          </thead>
+                  Title
 
-          <tbody>
-            {tableContent}
-          </tbody>
+                </th>
 
-        </table>
+                <th className="px-4 font-semibold">
+
+                  User
+
+                </th>
+
+                <th className="px-4 font-semibold">
+
+                  Status
+
+                </th>
+
+                <th className="px-4 font-semibold">
+
+                  Access
+
+                </th>
+
+                <th className="px-4 font-semibold">
+
+                  Date
+
+                </th>
+
+                <th className="px-4 font-semibold">
+
+                  Action
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {tableContent}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 

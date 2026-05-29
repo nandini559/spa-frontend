@@ -1,17 +1,23 @@
-import { useState } from "react";
-
+import {
+  useEffect,
+  useState
+} from "react";
 import api from "../../api/axios";
 
 interface Props {
+
   fetchUsers: () => void;
+
   closeForm: () => void;
+
+  selectedUser?: any;
 }
 
 const AddEditUser = ({
   fetchUsers,
-  closeForm
+  closeForm,
+  selectedUser
 }: Props) => {
-
   const [formData, setFormData] = useState({
     userId: "",
     password: "",
@@ -19,6 +25,24 @@ const AddEditUser = ({
   });
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+
+  if (selectedUser) {
+
+    setFormData({
+
+      userId:
+        selectedUser.userId || "",
+
+      password: "",
+
+      role:
+        selectedUser.role || "USER"
+    });
+  }
+
+}, [selectedUser]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -32,57 +56,88 @@ const AddEditUser = ({
     });
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+ const handleSubmit = async (
+  e: React.FormEvent
+) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
+  try {
 
-      setLoading(true);
+    setLoading(true);
 
-      const response = await api.post(
-        "/users",
-        formData
-      );
+    if (selectedUser) {
+
+      // UPDATE USER
+      const response =
+        await api.patch(
+
+          `/users/${selectedUser.id}`,
+
+          formData
+        );
 
       console.log(response.data);
 
-      alert("User Created Successfully");
-
-      fetchUsers();
-
-      closeForm();
-
-      setFormData({
-        userId: "",
-        password: "",
-        role: "USER"
-      });
-
-    } catch (error: any) {
-
-      console.log(error);
-
       alert(
-        error?.response?.data?.message ||
-        "Something went wrong"
+        "User Updated Successfully"
       );
 
-    } finally {
+    } else {
 
-      setLoading(false);
+      // CREATE USER
+      const response =
+        await api.post(
+          "/users",
+          formData
+        );
+
+      console.log(response.data);
+
+      alert(
+        "User Created Successfully"
+      );
     }
-  };
+
+    fetchUsers();
+
+    closeForm();
+
+    setFormData({
+
+      userId: "",
+      password: "",
+      role: "USER"
+    });
+
+  } catch (error: any) {
+
+    console.log(error);
+
+    alert(
+
+      error?.response?.data
+        ?.message ||
+
+      "Something went wrong"
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
 
   return (
 
     <div className="bg-white rounded-2xl shadow-sm border p-8 max-w-3xl">
 
       <h1 className="text-3xl font-bold mb-6">
-        Add New User
-      </h1>
+{
+  selectedUser
+    ? "Edit User"
+    : "Add New User"
+}      </h1>
 
       <form
         onSubmit={handleSubmit}
@@ -134,8 +189,12 @@ const AddEditUser = ({
 
           {
             loading
-              ? "Saving..."
-              : "Save User"
+  ? selectedUser
+    ? "Updating..."
+    : "Saving..."
+  : selectedUser
+    ? "Update User"
+    : "Save User"
           }
 
         </button>

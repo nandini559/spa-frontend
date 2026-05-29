@@ -1,12 +1,19 @@
 import {useEffect, useState} from "react";
+
 import {getUsers} from "../../api/userApi";
+
 import AddEditUser from "./addEditUsers";
+
+import {FaUsers, FaUserShield, FaCalendarAlt, FaEdit} from "react-icons/fa";
 
 const Users = () => {
   const [users, setUsers] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   const [showForm, setShowForm] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const fetchUsers = async () => {
     try {
@@ -26,38 +33,211 @@ const Users = () => {
 
   return (<div className="space-y-6">
     {/* Header */}
-    <div className="flex items-center justify-between">
-      <h1 className="text-3xl font-bold">Users Management</h1>
+    <div className="
+          flex flex-col
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+          gap-4
+        ">
+      <div>
+        <h1 className="
+              text-2xl sm:text-3xl
+              font-bold
+              text-gray-800
+            ">
+          Users Management
+        </h1>
 
-      <button onClick={() => setShowForm(true)} className="bg-[#6C4CF1] text-white px-5 py-2 rounded-lg">
-        Add User
+        <p className="text-gray-500 mt-1 text-sm sm:text-base">
+          Manage all users and permissions.
+        </p>
+      </div>
+
+      <button onClick={() => {
+          setSelectedUser(null);
+
+          setShowForm(true);
+        }} className="
+    bg-[#6C4CF1]
+    hover:bg-[#5a3ee0]
+    text-white
+    px-5 py-3
+    rounded-xl
+    shadow-lg
+    transition-all
+    duration-300
+    hover:-translate-y-1
+    w-full sm:w-auto
+  ">
+        + Add User
       </button>
     </div>
 
-    {/* Form */}
+    {/* Form Modal */}
     {
-      showForm && (<div>
-        <div className="flex justify-end mb-3">
-          <button onClick={() => setShowForm(false)} className="text-red-500 font-medium">
-            Close
-          </button>
-        </div>
+      showForm && (<div className="
+              fixed inset-0 z-50
+              bg-black/40
+              flex items-center justify-center
+              p-4
+            ">
+        <div className="
+                bg-white
+                w-full max-w-2xl
+                rounded-3xl
+                shadow-2xl
+                p-4 sm:p-6
+                overflow-y-auto
+                max-h-[90vh]
+              ">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+              Add User
+            </h2>
 
-        <AddEditUser fetchUsers={fetchUsers} closeForm={() => setShowForm(false)}/>
+            <button onClick={() => setShowForm(false)} className="
+                    text-red-500
+                    hover:text-red-700
+                    font-medium
+                  ">
+              Close
+            </button>
+          </div>
+          <AddEditUser fetchUsers={fetchUsers} closeForm={() => setShowForm(false)} selectedUser={selectedUser}/>{" "}
+        </div>
       </div>)
     }
 
-    {/* Table */}
-    <div className="bg-white rounded-2xl shadow-sm border p-6">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b text-left">
-              <th className="py-3">Username</th>
-              <th>Password</th>
-              <th>Role</th>
-              <th>Created At</th>
-              <th>Action</th>
+    {/* Stats Cards */}
+    <div className="
+          grid grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-4 sm:gap-6
+        ">
+      {/* Total Users */}
+      <div className="
+            bg-white
+            rounded-3xl
+            shadow-sm
+            border
+            p-6
+            hover:shadow-lg
+            transition-all
+          ">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm">Total Users</p>
+
+            <h2 className="text-4xl font-bold mt-3 text-gray-800">
+              {users.length}
+            </h2>
+          </div>
+
+          <div className="
+                w-14 h-14
+                rounded-2xl
+                bg-blue-500
+                text-white
+                flex items-center justify-center
+                text-2xl
+                shadow-lg
+              ">
+            <FaUsers/>
+          </div>
+        </div>
+      </div>
+
+      {/* Admin Count */}
+      <div className="
+            bg-white
+            rounded-3xl
+            shadow-sm
+            border
+            p-6
+            hover:shadow-lg
+            transition-all
+          ">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm">Admin Users</p>
+
+            <h2 className="text-4xl font-bold mt-3 text-gray-800">
+              {users.filter((user) => user.role === "ADMIN").length}
+            </h2>
+          </div>
+
+          <div className="
+                w-14 h-14
+                rounded-2xl
+                bg-purple-500
+                text-white
+                flex items-center justify-center
+                text-2xl
+                shadow-lg
+              ">
+            <FaUserShield/>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Users */}
+      <div className="
+            bg-white
+            rounded-3xl
+            shadow-sm
+            border
+            p-6
+            hover:shadow-lg
+            transition-all
+          ">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-500 text-sm">Active Users</p>
+
+            <h2 className="text-4xl font-bold mt-3 text-gray-800">
+              {users.length}
+            </h2>
+          </div>
+
+          <div className="
+                w-14 h-14
+                rounded-2xl
+                bg-green-500
+                text-white
+                flex items-center justify-center
+                text-2xl
+                shadow-lg
+              ">
+            <FaCalendarAlt/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Users Table */}
+    <div className="
+          bg-white
+          rounded-2xl sm:rounded-3xl
+          shadow-sm
+          border
+          p-4 sm:p-6
+        ">
+      <div className="overflow-x-auto rounded-2xl">
+        <table className="w-full min-w-[700px]">
+          <thead className="bg-gray-100">
+            <tr className="text-left text-gray-600">
+              <th className="py-4 px-4 font-semibold">Username</th>
+
+              <th className="px-4 font-semibold">Password</th>
+
+              <th className="px-4 font-semibold">Role</th>
+
+              <th className="px-4 font-semibold">Created At</th>
+
+              <th className="px-4 font-semibold">Action</th>
             </tr>
           </thead>
 
@@ -65,23 +245,63 @@ const Users = () => {
             {
               loading
                 ? (<tr>
-                  <td className="py-4">Loading...</td>
+                  <td colSpan={5} className="py-6 text-center">
+                    Loading...
+                  </td>
                 </tr>)
                 : users.length === 0
                   ? (<tr>
-                    <td className="py-4">No Users Found</td>
+                    <td colSpan={5} className="py-6 text-center">
+                      No Users Found
+                    </td>
                   </tr>)
-                  : (users.map((user) => (<tr key={user.id} className="border-b">
-                    <td className="py-4">{user.userId}</td>
+                  : (users.map((user) => (<tr key={user.id} className="
+                          border-b
+                          hover:bg-gray-50
+                          transition-all
+                        ">
+                    <td className="py-4 px-4 font-medium text-gray-700 whitespace-nowrap">
+                      {user.userId}
+                    </td>
 
-                    <td>********</td>
+                    <td className="px-4 text-gray-500 whitespace-nowrap">
+                      ********
+                    </td>
 
-                    <td>{user.role}</td>
+                    <td className="px-4 whitespace-nowrap">
+                      <span className={`
+                              px-3 py-1
+                              rounded-full
+                              text-xs sm:text-sm
+                              font-medium
+                              ${
+                        user.role === "ADMIN"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-blue-100 text-blue-700"}
+                            `}>
+                        {user.role}
+                      </span>
+                    </td>
 
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 text-gray-600 whitespace-nowrap">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
 
-                    <td>
-                      <button className="text-blue-500">Edit</button>
+                    <td className="px-4 whitespace-nowrap">
+                      <button onClick={() => {
+                          setSelectedUser(user);
+
+                          setShowForm(true);
+                        }} className="
+    flex items-center gap-2
+    text-blue-500
+    hover:text-blue-700
+    font-medium
+    transition
+  ">
+                        <FaEdit/>
+                        Edit
+                      </button>
                     </td>
                   </tr>)))
             }
