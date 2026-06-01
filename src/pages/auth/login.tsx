@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/authApi";
+import toast from "react-hot-toast";
 
 const Login = () => {
 
@@ -8,12 +9,17 @@ const Login = () => {
 
   const [formData, setFormData] = useState({
     userId: "",
+    username: "",
     password: "",
     role: "USER"
   });
 
   const [loading, setLoading] = useState(false);
 
+
+
+
+  
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement
@@ -26,56 +32,55 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async (
-    e: React.FormEvent
-  ) => {
+ const handleLogin = async (
+  e: React.FormEvent
+) => {
+  e.preventDefault();
 
-    e.preventDefault();
+  const toastId = toast.loading(
+    "Logging in..."
+  );
 
-    try {
+  try {
+    setLoading(true);
 
-      setLoading(true);
+    const response = await loginUser(
+      formData
+    );
 
-      const response = await loginUser(
-        formData
-      );
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.user)
+    );
 
-      console.log(response);
-
-      // Save logged in user
+    if (response.access_token) {
       localStorage.setItem(
-        "user",
-        JSON.stringify(response.user)
+        "token",
+        response.access_token
       );
-
-      // Save token if backend returns JWT
-      if (response.access_token) {
-
-        localStorage.setItem(
-          "token",
-          response.access_token
-        );
-      }
-
-      alert("Login Successful");
-
-      navigate("/dashboard");
-
-    } catch (error: any) {
-
-      console.log(error);
-
-      alert(
-        error?.response?.data?.message ||
-        "Login Failed"
-      );
-
-    } finally {
-
-      setLoading(false);
-
     }
-  };
+
+    toast.success(
+      "Login successful!",
+      { id: toastId }
+    );
+
+    navigate("/dashboard");
+
+  } catch (error: any) {
+
+    toast.error(
+      error?.response?.data?.message ||
+      "Login failed",
+      { id: toastId }
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 
   return (
 
@@ -157,15 +162,33 @@ const Login = () => {
             <div>
 
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                User ID
+                Email ID
               </label>
 
               <input
                 type="text"
-                name="userId"
+                name="emailID"
                 value={formData.userId}
                 onChange={handleChange}
-                placeholder="Enter your user id"
+                placeholder="Enter your email"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
+              />
+
+            </div>
+
+            {/* User name */}
+            <div>
+
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                User name
+              </label>
+
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Enter your username"
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
               />
 

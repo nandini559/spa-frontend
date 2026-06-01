@@ -20,6 +20,7 @@ const AddEditUser = ({
 }: Props) => {
   const [formData, setFormData] = useState({
     userId: "",
+    username: "",
     password: "",
     role: "USER"
   });
@@ -34,6 +35,9 @@ const AddEditUser = ({
 
       userId:
         selectedUser.userId || "",
+
+        username: 
+        selectedUser.username || "",
 
       password: "",
 
@@ -106,6 +110,7 @@ const AddEditUser = ({
     setFormData({
 
       userId: "",
+      username: "",
       password: "",
       role: "USER"
     });
@@ -145,10 +150,20 @@ const AddEditUser = ({
       >
 
         <input
-          type="text"
+          type="email"
           name="userId"
-          placeholder="User ID"
+          placeholder="emailID"
           value={formData.userId}
+          onChange={handleChange}
+          className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+          required
+        />
+
+         <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={formData.username}
           onChange={handleChange}
           className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
           required

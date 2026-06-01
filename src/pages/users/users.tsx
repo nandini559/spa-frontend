@@ -31,6 +31,73 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  let tableContent;
+
+  if (loading) {
+    tableContent = (<tr>
+      <td colSpan={5} className="py-6 text-center">
+        Loading...
+      </td>
+    </tr>);
+  } else if (users.length === 0) {
+    tableContent = (<tr>
+      <td colSpan={5} className="py-6 text-center">
+        No Users Found
+      </td>
+    </tr>);
+  } else {
+    tableContent = users.map((user) => (<tr key={user.id} className="
+        border-b
+        hover:bg-gray-50
+        transition-all
+      ">
+      <td className="py-4 px-4 font-medium text-gray-700 whitespace-nowrap">
+        {user.userId}
+      </td>
+
+      <td className="py-4 px-4 font-medium text-gray-700 whitespace-nowrap">
+        {user.username}
+      </td>
+
+      <td className="px-4 text-gray-500 whitespace-nowrap">********</td>
+
+      <td className="px-4 whitespace-nowrap">
+        <span className={`
+            px-3 py-1
+            rounded-full
+            text-xs sm:text-sm
+            font-medium
+            ${
+          user.role === "ADMIN"
+            ? "bg-purple-100 text-purple-700"
+            : "bg-blue-100 text-blue-700"}
+          `}>
+          {user.role}
+        </span>
+      </td>
+
+      <td className="px-4 text-gray-600 whitespace-nowrap">
+        {new Date(user.createdAt).toLocaleDateString()}
+      </td>
+
+      <td className="px-4 whitespace-nowrap">
+        <button onClick={() => {
+            setSelectedUser(user);
+            setShowForm(true);
+          }} className="
+            flex items-center gap-2
+            text-blue-500
+            hover:text-blue-700
+            font-medium
+            transition
+          ">
+          <FaEdit/>
+          Edit
+        </button>
+      </td>
+    </tr>));
+  }
+
   return (<div className="space-y-6">
     {/* Header */}
     <div className="
@@ -229,6 +296,8 @@ const Users = () => {
         <table className="w-full min-w-[700px]">
           <thead className="bg-gray-100">
             <tr className="text-left text-gray-600">
+              <th className="py-4 px-4 font-semibold">UserID</th>
+
               <th className="py-4 px-4 font-semibold">Username</th>
 
               <th className="px-4 font-semibold">Password</th>
@@ -241,71 +310,7 @@ const Users = () => {
             </tr>
           </thead>
 
-          <tbody>
-            {
-              loading
-                ? (<tr>
-                  <td colSpan={5} className="py-6 text-center">
-                    Loading...
-                  </td>
-                </tr>)
-                : users.length === 0
-                  ? (<tr>
-                    <td colSpan={5} className="py-6 text-center">
-                      No Users Found
-                    </td>
-                  </tr>)
-                  : (users.map((user) => (<tr key={user.id} className="
-                          border-b
-                          hover:bg-gray-50
-                          transition-all
-                        ">
-                    <td className="py-4 px-4 font-medium text-gray-700 whitespace-nowrap">
-                      {user.userId}
-                    </td>
-
-                    <td className="px-4 text-gray-500 whitespace-nowrap">
-                      ********
-                    </td>
-
-                    <td className="px-4 whitespace-nowrap">
-                      <span className={`
-                              px-3 py-1
-                              rounded-full
-                              text-xs sm:text-sm
-                              font-medium
-                              ${
-                        user.role === "ADMIN"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-blue-100 text-blue-700"}
-                            `}>
-                        {user.role}
-                      </span>
-                    </td>
-
-                    <td className="px-4 text-gray-600 whitespace-nowrap">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-
-                    <td className="px-4 whitespace-nowrap">
-                      <button onClick={() => {
-                          setSelectedUser(user);
-
-                          setShowForm(true);
-                        }} className="
-    flex items-center gap-2
-    text-blue-500
-    hover:text-blue-700
-    font-medium
-    transition
-  ">
-                        <FaEdit/>
-                        Edit
-                      </button>
-                    </td>
-                  </tr>)))
-            }
-          </tbody>
+          <tbody>{tableContent}</tbody>
         </table>
       </div>
     </div>
