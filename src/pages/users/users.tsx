@@ -17,16 +17,10 @@ const Users = () => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
-
   const usersPerPage = 5;
-
-  const indexOfLastUser = currentPage * usersPerPage;
-
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-
   const totalPages = Math.ceil(users.length / usersPerPage);
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const paginatedUsers = users.slice(startIndex, startIndex + usersPerPage);
 
   const fetchUsers = async () => {
     try {
@@ -61,7 +55,7 @@ const Users = () => {
       </td>
     </tr>);
   } else {
-    tableContent = currentUsers.map((user) => (<tr key={user.id} className="
+    tableContent = paginatedUsers.map((user) => (<tr key={user.id} className="
         border-b
         hover:bg-gray-50
         transition-all
@@ -323,6 +317,34 @@ const Users = () => {
           <tbody>{tableContent}</tbody>
         </table>
       </div>
+
+      <div className="flex justify-center gap-2 mt-6">
+        {
+          Array.from({
+            length: totalPages
+          }, (_, index) => (<button key={index + 1} onClick={() => setCurrentPage(index + 1)} className={`px-4 py-2 rounded-lg ${
+            currentPage === index + 1
+              ? "bg-[#6C4CF1] text-white"
+              : "border"}`}>
+            {index + 1}
+          </button>))
+        }
+      </div>
+    </div>
+
+    <div className="flex items-center justify-between mt-6">
+      <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Previous
+      </button>
+
+      <span className="text-gray-600">
+        Page {currentPage}
+        of {totalPages}
+      </span>
+
+      <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="px-4 py-2 border rounded-lg disabled:opacity-50">
+        Next
+      </button>
     </div>
   </div>);
 };
