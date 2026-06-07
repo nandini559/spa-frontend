@@ -41,17 +41,20 @@ const Profile = () => {
     </div>);
   }
 
-  return (<div className="max-w-5xl mx-auto px-2 sm:px-4">
-    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border overflow-hidden">
+  return (<div className="h-screen flex items-center justify-center px-2 sm:px-4 overflow-hidden">
+    <div className="w-full max-w-5xl">
+      {" "}
       {/* Top Banner */}
-      <div className="h-32 sm:h-40 bg-gradient-to-r from-[#6C4CF1] to-[#8B5CF6] relative">
+      <div className="h-24 sm:h-32 bg-gradient-to-r from-[#6C4CF1] to-[#8B5CF6] relative">
+        {" "}
         {/* Avatar */}
         <div className="
               absolute
               left-1/2 md:left-10
               transform -translate-x-1/2 md:translate-x-0
               bottom-[-45px]
-              sm:bottom-[-55px]
+
+              w-20 h-20 sm:w-24 sm:h-24
             ">
           <div className="
                 w-24 h-24
@@ -68,9 +71,10 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
       {/* Profile Content */}
-      <div className="pt-16 sm:pt-20 px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+      {/* Profile Content */}
+      <div className="pt-12 sm:pt-16 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6">
+        {" "}
         {/* Header */}
         <div className="
               flex flex-col
@@ -80,7 +84,9 @@ const Profile = () => {
               gap-5
             ">
           {/* User Info */}
-          <div className="text-center md:text-left">
+          {/* Info Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            {" "}
             <h1 className="
                   text-2xl sm:text-3xl
                   font-bold
@@ -89,10 +95,6 @@ const Profile = () => {
                 ">
               {user.userId}
             </h1>
-
-            <p className="text-gray-500 mt-1 text-sm sm:text-base">
-              {user.role}
-            </p>
           </div>
 
           {/* Button */}
@@ -113,7 +115,6 @@ const Profile = () => {
             Change Password
           </button>
         </div>
-
         {/* Info Cards */}
         <div className="
               grid grid-cols-1

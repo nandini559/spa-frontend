@@ -5,14 +5,12 @@ import {
 } from "react-router-dom";
 
 import api from "../../api/axios";
+import toast from "react-hot-toast";
 
 const AddEditUser = () => {
   const navigate = useNavigate();
-
   const { id } = useParams();
-
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     userId: "",
     username: "",
@@ -57,46 +55,52 @@ const AddEditUser = () => {
   };
 
   const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  e: React.FormEvent
+) => {
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  const toastId = toast.loading(
+    id ? "Updating user..." : "Creating user..."
+  );
 
-      if (id) {
-        await api.patch(
-          `/users/${id}`,
-          formData
-        );
+  try {
+    setLoading(true);
 
-        alert(
-          "User Updated Successfully"
-        );
-      } else {
-        await api.post(
-          "/users",
-          formData
-        );
-
-        alert(
-          "User Created Successfully"
-        );
-      }
-
-      navigate("/users");
-    } catch (error: any) {
-      console.log(error);
-
-      alert(
-        error?.response?.data
-          ?.message ||
-          "Something went wrong"
+    if (id) {
+      await api.patch(
+        `/users/${id}`,
+        formData
       );
-    } finally {
-      setLoading(false);
+
+      toast.success(
+        "User Updated Successfully",
+        { id: toastId }
+      );
+    } else {
+      await api.post(
+        "/users",
+        formData
+      );
+
+      toast.success(
+        "User Created Successfully",
+        { id: toastId }
+      );
     }
-  };
+
+    navigate("/users");
+  } catch (error: any) {
+    console.log(error);
+
+    toast.error(
+      error?.response?.data?.message ||
+      "Something went wrong",
+      { id: toastId }
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -108,6 +112,12 @@ const AddEditUser = () => {
             ? "Edit User"
             : "Add New User"}
         </h1>
+
+        <div className="mb-6 flex justify-end">
+        <button type="button" onClick={() => navigate("/users")} className="px-4 py-2 border border-gray-300 rounded-xl text-blue-500 hover:bg-gray-100 transition">
+          ← Back
+        </button>
+      </div>
 
         <form
           onSubmit={handleSubmit}

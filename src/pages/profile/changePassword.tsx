@@ -1,7 +1,5 @@
 import {useState} from "react";
-
 import {FaLock} from "react-icons/fa";
-
 import api from "../../api/axios";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
