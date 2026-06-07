@@ -6,6 +6,7 @@ import {
 import { getRecords } from "../../api/recordApi";
 
 import AddEditRecord from "./addEditRecords";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Records = () => {
 
@@ -20,6 +21,9 @@ const Records = () => {
 
   const [selectedRecord, setSelectedRecord] =
     useState<any>(null);
+
+  const navigate = useNavigate();
+
 
   const fetchRecords = async () => {
 
@@ -160,15 +164,7 @@ const Records = () => {
           <td className="px-4 whitespace-nowrap">
 
             <button
-              onClick={() => {
-
-                setSelectedRecord(
-                  record
-                );
-
-                setShowForm(true);
-
-              }}
+             onClick={() =>  navigate(`/records/edit/${record.id}`)} 
               className="
                 text-blue-500
                 hover:text-blue-700
@@ -176,13 +172,9 @@ const Records = () => {
                 transition
               "
             >
-
               Edit
-
             </button>
-
           </td>
-
         </tr>
       )
     );
@@ -227,32 +219,22 @@ const Records = () => {
         </div>
 
         <button
-          onClick={() => {
-
-            setSelectedRecord(
-              null
-            );
-
-            setShowForm(true);
-
-          }}
-          className="
-            bg-[#6C4CF1]
-            hover:bg-[#5a3ee0]
-            text-white
-            px-5 py-3
-            rounded-xl
-            shadow-lg
-            transition-all
-            duration-300
-            hover:-translate-y-1
-            w-full sm:w-auto
-          "
-        >
-
-          + Add Record
-
-        </button>
+  onClick={() => navigate("/records/add")}
+  className="
+    bg-[#6C4CF1]
+    hover:bg-[#5a3ee0]
+    text-white
+    px-5 py-3
+    rounded-xl
+    shadow-lg
+    transition-all
+    duration-300
+    hover:-translate-y-1
+    w-full sm:w-auto
+  "
+>
+  + Add Record
+</button>
 
       </div>
 
@@ -311,17 +293,6 @@ const Records = () => {
 
               </div>
 
-              <AddEditRecord
-                fetchRecords={
-                  fetchRecords
-                }
-                closeForm={() =>
-                  setShowForm(false)
-                }
-                selectedRecord={
-                  selectedRecord
-                }
-              />
 
             </div>
 

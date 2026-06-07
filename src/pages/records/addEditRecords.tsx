@@ -1,45 +1,89 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  useNavigate,
+  useParams
+} from "react-router-dom";
 
 import api from "../../api/axios";
 
-interface Props {
-  fetchRecords: () => void;
-  closeForm: () => void;
-  selectedRecord?: any;
-}
+const AddEditRecord = () => {
 
-const AddEditRecord = ({
-  fetchRecords,
-  closeForm,
-  selectedRecord
-}: Props) => {
+  const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-  title:
-    selectedRecord?.title || "",
+  const { id } = useParams();
 
-  status:
-    selectedRecord?.status || "ACTIVE",
+  const [loading, setLoading] =
+    useState(false);
 
-  access:
-    selectedRecord?.access || "FULL_ACCESS",
+  const [formData, setFormData] =
+    useState({
+      title: "",
+      status: "ACTIVE",
+      access: "FULL_ACCESS",
+      userId: ""
+    });
 
-  userId:
-    selectedRecord?.userId || ""
-});
+  useEffect(() => {
 
-  const [loading, setLoading] = useState(false);
+    if (!id) return;
+
+    const fetchRecord = async () => {
+
+      try {
+
+        const response =
+          await api.get(
+            `/records/${id}`
+          );
+
+        const record =
+          response.data;
+
+        setFormData({
+          title:
+            record.title || "",
+
+          status:
+            record.status ||
+            "ACTIVE",
+
+          access:
+            record.access ||
+            "FULL_ACCESS",
+
+          userId:
+            record.userId || ""
+        });
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+    fetchRecord();
+
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
+      HTMLInputElement |
+      HTMLSelectElement
     >
   ) => {
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]:
+        e.target.value
     });
+
   };
 
   const handleSubmit = async (
@@ -52,150 +96,155 @@ const AddEditRecord = ({
 
       setLoading(true);
 
-     const response = selectedRecord
+      if (id) {
 
-  ? await api.patch(
-      `/records/${selectedRecord.id}`,
-      formData
-    )
+        await api.patch(
+          `/records/${id}`,
+          formData
+        );
 
-  : await api.post(
-      "/records",
-      formData
-    );
+        alert(
+          "Record Updated Successfully"
+        );
 
-      console.log(response.data);
+      } else {
 
-      alert("Record Created Successfully");
+        await api.post(
+          "/records",
+          formData
+        );
 
-      fetchRecords();
+        alert(
+          "Record Created Successfully"
+        );
 
-      closeForm();
+      }
 
-      setFormData({
-        title: "",
-        status: "ACTIVE",
-        access: "FULL_ACCESS",
-        userId: ""
-      });
+      navigate("/records");
 
     } catch (error: any) {
 
       console.log(error);
 
       alert(
-        error?.response?.data?.message ||
+        error?.response?.data
+          ?.message ||
         "Something went wrong"
       );
 
     } finally {
 
       setLoading(false);
+
     }
+
   };
 
   return (
 
-    <div className="bg-white rounded-2xl shadow-sm border p-8 max-w-3xl">
+    <div className="min-h-screen bg-gray-50 p-6">
 
-      <h1 className="text-3xl font-bold mb-6">
-       {
-  selectedRecord
-    ? "Edit Record"
-    : "Add New Record"
-}
-      </h1>
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border p-8">
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
+        <h1 className="text-3xl font-bold mb-6">
 
-        {/* Title */}
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3"
-          required
-        />
+          {id
+            ? "Edit Record"
+            : "Add New Record"}
 
-        {/* User ID */}
-        <input
-          type="text"
-          name="userId"
-          placeholder="User ID"
-          value={formData.userId}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3"
-          required
-        />
+        </h1>
 
-        {/* Status */}
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3"
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
 
-          <option value="ACTIVE">
-            Active
-          </option>
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={formData.title}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3"
+            required
+          />
 
-          <option value="PENDING">
-            Pending
-          </option>
+          <input
+            type="text"
+            name="userId"
+            placeholder="User ID"
+            value={formData.userId}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3"
+            required
+          />
 
-          <option value="CLOSED">
-            Closed
-          </option>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3"
+          >
 
-        </select>
+            <option value="ACTIVE">
+              Active
+            </option>
 
-        {/* Access */}
-        <select
-          name="access"
-          value={formData.access}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3"
-        >
+            <option value="PENDING">
+              Pending
+            </option>
 
-          <option value="FULL_ACCESS">
-            Full Access
-          </option>
+            <option value="CLOSED">
+              Closed
+            </option>
 
-          <option value="LIMITED_ACCESS">
-            Limited Access
-          </option>
+          </select>
 
-          <option value="READ_ONLY">
-            Read Only
-          </option>
+          <select
+            name="access"
+            value={formData.access}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3"
+          >
 
-        </select>
+            <option value="FULL_ACCESS">
+              Full Access
+            </option>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="col-span-full bg-[#6C4CF1] text-white py-3 rounded-lg"
-        >
+            <option value="LIMITED_ACCESS">
+              Limited Access
+            </option>
 
-          {
-            loading
-              ? "Saving..."
-              : "Save Record"
-          }
+            <option value="READ_ONLY">
+              Read Only
+            </option>
 
-        </button>
+          </select>
 
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="col-span-full bg-[#6C4CF1] hover:bg-[#5a3ee0] text-white py-3 rounded-lg"
+          >
+
+            {loading
+              ? id
+                ? "Updating..."
+                : "Saving..."
+              : id
+              ? "Update Record"
+              : "Save Record"}
+
+          </button>
+
+        </form>
+
+      </div>
 
     </div>
+
   );
+
 };
 
 export default AddEditRecord;

@@ -1,23 +1,18 @@
+import { useEffect, useState } from "react";
 import {
-  useEffect,
-  useState
-} from "react";
+  useNavigate,
+  useParams
+} from "react-router-dom";
+
 import api from "../../api/axios";
 
-interface Props {
+const AddEditUser = () => {
+  const navigate = useNavigate();
 
-  fetchUsers: () => void;
+  const { id } = useParams();
 
-  closeForm: () => void;
+  const [loading, setLoading] = useState(false);
 
-  selectedUser?: any;
-}
-
-const AddEditUser = ({
-  fetchUsers,
-  closeForm,
-  selectedUser
-}: Props) => {
   const [formData, setFormData] = useState({
     userId: "",
     username: "",
@@ -25,197 +20,163 @@ const AddEditUser = ({
     role: "USER"
   });
 
-  const [loading, setLoading] = useState(false);
-
   useEffect(() => {
+    if (!id) return;
 
-  if (selectedUser) {
+    const fetchUser = async () => {
+      try {
+        const response = await api.get(
+          `/users/${id}`
+        );
 
-    setFormData({
+        const user = response.data;
 
-      userId:
-        selectedUser.userId || "",
+        setFormData({
+          userId: user.userId || "",
+          username: user.username || "",
+          password: "",
+          role: user.role || "USER"
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-        username: 
-        selectedUser.username || "",
-
-      password: "",
-
-      role:
-        selectedUser.role || "USER"
-    });
-  }
-
-}, [selectedUser]);
+    fetchUser();
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement
     >
   ) => {
-
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
- const handleSubmit = async (
-  e: React.FormEvent
-) => {
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
+    e.preventDefault();
 
-  e.preventDefault();
+    try {
+      setLoading(true);
 
-  try {
-
-    setLoading(true);
-
-    if (selectedUser) {
-
-      // UPDATE USER
-      const response =
+      if (id) {
         await api.patch(
-
-          `/users/${selectedUser.id}`,
-
+          `/users/${id}`,
           formData
         );
 
-      console.log(response.data);
-
-      alert(
-        "User Updated Successfully"
-      );
-
-    } else {
-
-      // CREATE USER
-      const response =
+        alert(
+          "User Updated Successfully"
+        );
+      } else {
         await api.post(
           "/users",
           formData
         );
 
-      console.log(response.data);
+        alert(
+          "User Created Successfully"
+        );
+      }
+
+      navigate("/users");
+    } catch (error: any) {
+      console.log(error);
 
       alert(
-        "User Created Successfully"
+        error?.response?.data
+          ?.message ||
+          "Something went wrong"
       );
+    } finally {
+      setLoading(false);
     }
-
-    fetchUsers();
-
-    closeForm();
-
-    setFormData({
-
-      userId: "",
-      username: "",
-      password: "",
-      role: "USER"
-    });
-
-  } catch (error: any) {
-
-    console.log(error);
-
-    alert(
-
-      error?.response?.data
-        ?.message ||
-
-      "Something went wrong"
-    );
-
-  } finally {
-
-    setLoading(false);
-  }
-};
+  };
 
   return (
+    <div className="min-h-screen bg-gray-50 p-6">
 
-    <div className="bg-white rounded-2xl shadow-sm border p-8 max-w-3xl">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border p-8">
 
-      <h1 className="text-3xl font-bold mb-6">
-{
-  selectedUser
-    ? "Edit User"
-    : "Add New User"
-}      </h1>
+        <h1 className="text-3xl font-bold mb-6">
+          {id
+            ? "Edit User"
+            : "Add New User"}
+        </h1>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-
-        <input
-          type="email"
-          name="userId"
-          placeholder="emailID"
-          value={formData.userId}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
-          required
-        />
-
-         <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
-          required
-        />
-
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
+          <input
+            type="email"
+            name="userId"
+            placeholder="Email ID"
+            value={formData.userId}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+            required
+          />
 
-          <option value="USER">
-            User
-          </option>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+            required
+          />
 
-          <option value="ADMIN">
-            Admin
-          </option>
+          <input
+            type="password"
+            name="password"
+            placeholder={
+              id
+                ? "New Password (optional)"
+                : "Password"
+            }
+            value={formData.password}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+            required={!id}
+          />
 
-        </select>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#6C4CF1]"
+          >
+            <option value="USER">
+              User
+            </option>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="col-span-full bg-[#6C4CF1] hover:bg-[#5a3ee0] text-white py-3 rounded-lg transition-all duration-300"
-        >
+            <option value="ADMIN">
+              Admin
+            </option>
+          </select>
 
-          {
-            loading
-  ? selectedUser
-    ? "Updating..."
-    : "Saving..."
-  : selectedUser
-    ? "Update User"
-    : "Save User"
-          }
-
-        </button>
-
-      </form>
-
+          <button
+            type="submit"
+            disabled={loading}
+            className="col-span-full bg-[#6C4CF1] hover:bg-[#5a3ee0] text-white py-3 rounded-lg transition-all duration-300"
+          >
+            {loading
+              ? id
+                ? "Updating..."
+                : "Saving..."
+              : id
+              ? "Update User"
+              : "Save User"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

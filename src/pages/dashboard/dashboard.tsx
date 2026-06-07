@@ -256,7 +256,7 @@ const Dashboard = () => {
 
           <button
             onClick={() =>
-              setShowForm(true)
+             navigate("/records/add")
             }
             className="
               bg-[#6C4CF1]

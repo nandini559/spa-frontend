@@ -5,6 +5,7 @@ import {getUsers} from "../../api/userApi";
 import AddEditUser from "./addEditUsers";
 
 import {FaUsers, FaUserShield, FaCalendarAlt, FaEdit} from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
 const Users = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -13,13 +14,27 @@ const Users = () => {
 
   const [showForm, setShowForm] = useState(false);
 
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const usersPerPage = 5;
+
+  const indexOfLastUser = currentPage * usersPerPage;
+
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(users.length / usersPerPage);
 
   const fetchUsers = async () => {
     try {
       const data = await getUsers();
 
       setUsers(data);
+
+      setCurrentPage(1);
     } catch (error) {
       console.log(error);
     } finally {
@@ -35,18 +50,18 @@ const Users = () => {
 
   if (loading) {
     tableContent = (<tr>
-      <td colSpan={5} className="py-6 text-center">
+      <td colSpan={6} className="py-6 text-center">
         Loading...
       </td>
     </tr>);
   } else if (users.length === 0) {
     tableContent = (<tr>
-      <td colSpan={5} className="py-6 text-center">
+      <td colSpan={6} className="py-6 text-center">
         No Users Found
       </td>
     </tr>);
   } else {
-    tableContent = users.map((user) => (<tr key={user.id} className="
+    tableContent = currentUsers.map((user) => (<tr key={user.id} className="
         border-b
         hover:bg-gray-50
         transition-all
@@ -81,10 +96,7 @@ const Users = () => {
       </td>
 
       <td className="px-4 whitespace-nowrap">
-        <button onClick={() => {
-            setSelectedUser(user);
-            setShowForm(true);
-          }} className="
+        <button onClick={() => navigate(`/users/edit/${user.id}`)} className="
             flex items-center gap-2
             text-blue-500
             hover:text-blue-700
@@ -122,9 +134,7 @@ const Users = () => {
       </div>
 
       <button onClick={() => {
-          setSelectedUser(null);
-
-          setShowForm(true);
+          navigate("/users/add");
         }} className="
     bg-[#6C4CF1]
     hover:bg-[#5a3ee0]
@@ -172,7 +182,7 @@ const Users = () => {
               Close
             </button>
           </div>
-          <AddEditUser fetchUsers={fetchUsers} closeForm={() => setShowForm(false)} selectedUser={selectedUser}/>{" "}
+          <AddEditUser/>
         </div>
       </div>)
     }
@@ -199,7 +209,7 @@ const Users = () => {
             <p className="text-gray-500 text-sm">Total Users</p>
 
             <h2 className="text-4xl font-bold mt-3 text-gray-800">
-              {users.length}
+              {Users.length}
             </h2>
           </div>
 

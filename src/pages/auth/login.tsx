@@ -162,12 +162,12 @@ const Login = () => {
             <div>
 
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                Email ID
+                UserID
               </label>
 
               <input
                 type="text"
-                name="emailID"
+                name="userId"
                 value={formData.userId}
                 onChange={handleChange}
                 placeholder="Enter your email"
