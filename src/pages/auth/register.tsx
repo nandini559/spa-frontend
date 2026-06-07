@@ -1,108 +1,92 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../../api/authApi";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
 
-const Login = () => {
-
+const Register = () => {
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     userId: "",
     username: "",
     password: "",
-    role: "USER"
+    confirmPassword: "",
+    role: "USER",
   });
 
-  const [loading, setLoading] = useState(false);
-
-
-
-
-  
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement
     >
   ) => {
-
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
- const handleLogin = async (
-  e: React.FormEvent
-) => {
-  e.preventDefault();
+  const handleRegister = async (
+    e: React.FormEvent
+  ) => {
+    e.preventDefault();
 
-  const toastId = toast.loading(
-    "Logging in..."
-  );
-
-  try {
-    setLoading(true);
-
-    const response = await loginUser(
-      formData
-    );
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(response.user)
-    );
-
-    if (response.access_token) {
-      localStorage.setItem(
-        "token",
-        response.access_token
+    if (
+      formData.password !==
+      formData.confirmPassword
+    ) {
+      return toast.error(
+        "Passwords do not match"
       );
     }
 
-    toast.success(
-      "Login successful!",
-      { id: toastId }
+    const toastId = toast.loading(
+      "Creating account..."
     );
 
-    navigate("/dashboard");
+    try {
+      setLoading(true);
 
-  } catch (error: any) {
+      await api.post("/users", {
+        userId: formData.userId,
+        username: formData.username,
+        password: formData.password,
+        role: formData.role,
+      });
 
-    toast.error(
-      error?.response?.data?.message ||
-      "Login failed",
-      { id: toastId }
-    );
+      toast.success(
+        "Account created successfully!",
+        { id: toastId }
+      );
 
-  } finally {
-
-    setLoading(false);
-
-  }
-};
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Registration failed",
+        { id: toastId }
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-
     <div className="min-h-screen flex flex-col md:grid md:grid-cols-2 bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#1e293b]">
 
       {/* Left Section */}
       <div className="relative hidden md:flex items-center justify-center overflow-hidden px-6 lg:px-12 py-12">
 
-        {/* Background Glow */}
         <div className="absolute w-72 h-72 bg-purple-500/20 rounded-full blur-3xl top-10 left-10"></div>
 
         <div className="absolute w-72 h-72 bg-blue-500/20 rounded-full blur-3xl bottom-10 right-10"></div>
 
-        {/* Content */}
         <div className="relative z-10 text-center text-white max-w-lg">
-
           <div className="w-20 h-20 lg:w-24 lg:h-24 bg-[#6C4CF1] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-
             <span className="text-3xl lg:text-4xl">
-              🔐
+              🚀
             </span>
-
           </div>
 
           <h1 className="text-3xl lg:text-5xl font-extrabold mb-4 leading-tight">
@@ -110,11 +94,9 @@ const Login = () => {
           </h1>
 
           <p className="text-gray-300 text-base lg:text-lg">
-            Secure. Simple. Smart.
+            Create your account and get started.
           </p>
-
         </div>
-
       </div>
 
       {/* Right Section */}
@@ -124,41 +106,37 @@ const Login = () => {
 
           {/* Mobile Logo */}
           <div className="md:hidden text-center mb-6">
-
             <div className="w-16 h-16 bg-[#6C4CF1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-
               <span className="text-2xl">
-                🔐
+                🚀
               </span>
-
             </div>
 
             <h1 className="text-2xl font-bold text-gray-800">
               SPA Application
             </h1>
-
           </div>
 
           {/* Heading */}
-         <h2 className="text-3xl font-bold text-gray-800">
-  Login
-</h2>
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+              Create Account
+            </h2>
 
-<p className="text-gray-500">
-  Welcome back! Please login to continue.
-</p>
+            <p className="text-sm sm:text-base text-gray-500">
+              Join us by creating a new account
+            </p>
+          </div>
 
           {/* Form */}
           <form
             className="space-y-5"
-            onSubmit={handleLogin}
+            onSubmit={handleRegister}
           >
 
-            {/* User ID */}
             <div>
-
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                UserID
+                User ID
               </label>
 
               <input
@@ -167,16 +145,14 @@ const Login = () => {
                 value={formData.userId}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
+                required
               />
-
             </div>
 
-            {/* User name */}
             <div>
-
               <label className="block mb-2 text-sm font-medium text-gray-700">
-                User name
+                Username
               </label>
 
               <input
@@ -185,14 +161,12 @@ const Login = () => {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Enter your username"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
+                required
               />
-
             </div>
 
-            {/* Password */}
             <div>
-
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Password
               </label>
@@ -202,15 +176,29 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
+                placeholder="Enter password"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
+                required
               />
-
             </div>
 
-            {/* Role */}
             <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
 
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
+                required
+              />
+            </div>
+
+            <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Role
               </label>
@@ -219,9 +207,8 @@ const Login = () => {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm sm:text-base outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1] transition"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-purple-300 focus:border-[#6C4CF1]"
               >
-
                 <option value="USER">
                   General User
                 </option>
@@ -229,47 +216,39 @@ const Login = () => {
                 <option value="ADMIN">
                   Admin
                 </option>
-
               </select>
-
             </div>
 
-            {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#6C4CF1] hover:bg-[#5938db] active:scale-[0.98] transition-all duration-200 text-white py-3 rounded-xl font-semibold shadow-lg disabled:opacity-70 text-sm sm:text-base"
+              className="w-full bg-[#6C4CF1] hover:bg-[#5938db] text-white py-3 rounded-xl font-semibold shadow-lg disabled:opacity-70"
             >
-
-              {
-                loading
-                  ? "Logging in..."
-                  : "Login"
-              }
-
+              {loading
+                ? "Creating Account..."
+                : "Create Account"}
             </button>
 
             <div className="text-center mt-6">
-  <p className="text-gray-600">
-    New user?{" "}
-    <button
-      type="button"
-      onClick={() => navigate("/register")}
-      className="text-[#6C4CF1] font-semibold hover:underline"
-    >
-      Create an account
-    </button>
-  </p>
-</div>
+              <p className="text-gray-600">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/")
+                  }
+                  className="text-[#6C4CF1] font-semibold hover:underline"
+                >
+                  Login
+                </button>
+              </p>
+            </div>
 
           </form>
-
         </div>
-
       </div>
-
     </div>
   );
 };
 
-export default Login;
+export default Register;

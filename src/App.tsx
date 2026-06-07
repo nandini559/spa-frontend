@@ -11,12 +11,14 @@ import ChangePassword from "./pages/profile/changePassword";
 import ProtectedRoute from "./pages/auth/protectedRoute";
 import AddEditUser from "./pages/users/addEditUsers";
 import AddEditRecord from "./pages/records/addEditRecords";
+import Register from "./pages/auth/register";
 
 function App() {
   return (<BrowserRouter>
     <Routes>
       {/* Public Route */}
       <Route path="/" element={<Login />}/> {/* Protected Routes */}
+      <Route path="/register" element={<Register />}/>
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />}/>
