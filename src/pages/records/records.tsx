@@ -2,11 +2,15 @@ import {
   useEffect,
   useState
 } from "react";
-
 import { getRecords } from "../../api/recordApi";
-
 import AddEditRecord from "./addEditRecords";
 import { Navigate, useNavigate } from "react-router-dom";
+import {
+  FaFileAlt,
+  FaCheckCircle,
+  FaClock
+} from "react-icons/fa";
+
 
 const Records = () => {
 
@@ -22,17 +26,31 @@ const Records = () => {
   const [selectedRecord, setSelectedRecord] =
     useState<any>(null);
 
+
   const navigate = useNavigate();
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+const recordsPerPage = 5;
+
+const totalPages = Math.ceil(records.length / recordsPerPage) ||1;
+
+const startIndex = (currentPage - 1) * recordsPerPage;
+
+const paginatedRecords = records.slice(
+  startIndex,
+  startIndex + recordsPerPage
+);
 
   const fetchRecords = async () => {
 
     try {
 
-      const data =
-        await getRecords();
+     const data = await getRecords();
 
-      setRecords(data);
+setRecords(data);
+
+setCurrentPage(1);
 
     } catch (error) {
 
@@ -92,8 +110,7 @@ const Records = () => {
 
   } else {
 
-    tableContent = records.map(
-      (record) => (
+    tableContent = paginatedRecords.map((record) => (
 
         <tr
           key={record.id}
@@ -178,6 +195,7 @@ const Records = () => {
         </tr>
       )
     );
+
   }
 
   return (
@@ -300,6 +318,143 @@ const Records = () => {
         )
       }
 
+      {/* Stats Cards */}
+<div
+  className="
+    grid grid-cols-1
+    sm:grid-cols-2
+    lg:grid-cols-3
+    gap-4 sm:gap-6
+  "
+>
+  {/* Total Records */}
+  <div
+    className="
+      bg-white
+      rounded-3xl
+      shadow-sm
+      border
+      p-6
+      hover:shadow-lg
+      transition-all
+    "
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-500 text-sm">
+          Total Records
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-gray-800">
+          {records.length}
+        </h2>
+      </div>
+
+      <div
+        className="
+          w-14 h-14
+          rounded-2xl
+          bg-blue-500
+          text-white
+          flex items-center justify-center
+          text-2xl
+          shadow-lg
+        "
+      >
+        <FaFileAlt />
+      </div>
+    </div>
+  </div>
+
+  {/* Active Records */}
+  <div
+    className="
+      bg-white
+      rounded-3xl
+      shadow-sm
+      border
+      p-6
+      hover:shadow-lg
+      transition-all
+    "
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-500 text-sm">
+          Active Records
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-gray-800">
+          {
+            records.filter(
+              (record) =>
+                record.status === "ACTIVE"
+            ).length
+          }
+        </h2>
+      </div>
+
+      <div
+        className="
+          w-14 h-14
+          rounded-2xl
+          bg-green-500
+          text-white
+          flex items-center justify-center
+          text-2xl
+          shadow-lg
+        "
+      >
+        <FaCheckCircle />
+      </div>
+    </div>
+  </div>
+
+  {/* Pending Records */}
+  <div
+    className="
+      bg-white
+      rounded-3xl
+      shadow-sm
+      border
+      p-6
+      hover:shadow-lg
+      transition-all
+    "
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-500 text-sm">
+          Pending Records
+        </p>
+
+        <h2 className="text-4xl font-bold mt-3 text-gray-800">
+          {
+            records.filter(
+              (record) =>
+                record.status === "PENDING"
+            ).length
+          }
+        </h2>
+      </div>
+
+      <div
+        className="
+          w-14 h-14
+          rounded-2xl
+          bg-yellow-500
+          text-white
+          flex items-center justify-center
+          text-2xl
+          shadow-lg
+        "
+      >
+        <FaClock />
+      </div>
+    </div>
+  </div>
+</div>
+
       {/* Table */}
       <div
         className="
@@ -371,7 +526,60 @@ const Records = () => {
 
       </div>
 
+      <div className="flex justify-center gap-2 mt-6">
+  {Array.from(
+    { length: totalPages },
+    (_, index) => (
+      <button
+        key={index + 1}
+        onClick={() =>
+          setCurrentPage(index + 1)
+        }
+        className={`px-4 py-2 rounded-lg ${
+          currentPage === index + 1
+            ? "bg-[#6C4CF1] text-white"
+            : "border"
+        }`}
+      >
+        {index + 1}
+      </button>
+    )
+  )}
+</div>
+
+<div className="flex items-center justify-between mt-6">
+  <button
+    onClick={() =>
+      setCurrentPage((prev) =>
+        Math.max(prev - 1, 1)
+      )
+    }
+    disabled={currentPage === 1}
+    className="px-4 py-2 border rounded-lg disabled:opacity-50"
+  >
+    Previous
+  </button>
+
+  <span className="text-gray-600">
+    Page {currentPage} of {totalPages}
+  </span>
+
+  <button
+    onClick={() =>
+      setCurrentPage((prev) =>
+        Math.min(prev + 1, totalPages)
+      )
+    }
+    disabled={currentPage === totalPages}
+    className="px-4 py-2 border rounded-lg disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
+
     </div>
+
+
   );
 };
 

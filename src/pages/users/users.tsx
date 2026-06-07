@@ -18,7 +18,7 @@ const Users = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
-  const totalPages = Math.ceil(users.length / usersPerPage);
+  const totalPages = Math.ceil(users.length / usersPerPage) || 1;
   const startIndex = (currentPage - 1) * usersPerPage;
   const paginatedUsers = users.slice(startIndex, startIndex + usersPerPage);
 
