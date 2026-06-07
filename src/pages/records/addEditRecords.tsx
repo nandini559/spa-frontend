@@ -154,6 +154,12 @@ const AddEditRecord = () => {
 
         </h1>
 
+         <div className="mb-6 flex justify-end">
+        <button type="button" onClick={() => navigate("/records")} className="px-4 py-2 border border-gray-300 rounded-xl text-blue-500 hover:bg-gray-100 transition">
+          ← Back
+        </button>
+      </div>
+
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
