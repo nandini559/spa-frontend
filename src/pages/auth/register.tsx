@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
+
 const Register = () => {
   const navigate = useNavigate();
 
@@ -28,49 +29,54 @@ const Register = () => {
   };
 
   const handleRegister = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  e: React.FormEvent
+) => {
+  e.preventDefault();
 
-    if (
-      formData.password !==
-      formData.confirmPassword
-    ) {
-      return toast.error(
-        "Passwords do not match"
-      );
-    }
-
-    const toastId = toast.loading(
-      "Creating account..."
+  if (
+    formData.password !==
+    formData.confirmPassword
+  ) {
+    return toast.error(
+      "Passwords do not match"
     );
+  }
 
-    try {
-      setLoading(true);
+  const toastId = toast.loading(
+    "Creating account..."
+  );
 
-      await api.post("/users", {
+  try {
+    setLoading(true);
+
+    const response = await api.post(
+      "/users",
+      {
         userId: formData.userId,
         username: formData.username,
         password: formData.password,
         role: formData.role,
-      });
+      }
+    );
 
-      toast.success(
-        "Account created successfully!",
-        { id: toastId }
-      );
+    console.log(response.data);
 
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message ||
-          "Registration failed",
-        { id: toastId }
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success(
+      "Account created successfully!",
+      { id: toastId }
+    );
+
+    navigate("/");
+  } catch (error: any) {
+    toast.error(
+      error?.response?.data?.message ||
+        "Registration failed",
+      { id: toastId }
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col md:grid md:grid-cols-2 bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#1e293b]">
